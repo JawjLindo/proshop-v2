@@ -6,6 +6,7 @@ import { useAuthDispatch, useAuthValue, useCartValue } from '../../contexts';
 import { useMutation } from '@tanstack/react-query';
 import { services } from '../../services';
 import { useNavigate } from 'react-router-dom';
+import { AxiosError } from 'axios';
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export const Header = () => {
   const authDispatch = useAuthDispatch();
   const { cartItems } = useCartValue();
 
-  const { mutate: logout } = useMutation({
+  const { mutate: logout } = useMutation<void, AxiosError, void>({
     mutationKey: ['logout'],
     mutationFn: () => {
       return services.users.logout();

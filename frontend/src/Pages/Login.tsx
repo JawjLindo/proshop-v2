@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { Components } from '../components';
+import { Types } from '../types';
 
 type LoginFormValues = {
   email: string;
@@ -35,9 +36,13 @@ export const Login = () => {
     }
   }, [userInfo, redirect, navigate]);
 
-  const { mutate: login, isPending } = useMutation({
+  const { mutate: login, isPending } = useMutation<
+    Types.User,
+    Error,
+    { email: string; password: string }
+  >({
     mutationKey: ['login'],
-    mutationFn: (data: { email: string; password: string }) => {
+    mutationFn: (data) => {
       return services.users.login(data.email, data.password);
     },
     onSuccess: (userInfo) => {

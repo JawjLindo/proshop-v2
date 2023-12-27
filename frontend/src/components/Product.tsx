@@ -3,6 +3,7 @@ import { Types } from '../types';
 import { Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Rating } from './Rating';
+import { formatImageUrl } from '../utils';
 
 type ProductProps = {
   product: Types.Product;
@@ -12,7 +13,7 @@ export const Product: FunctionComponent<ProductProps> = ({ product }) => {
   return (
     <Card className='my-3 p-3 rounded'>
       <Link to={`/product/${product._id}`}>
-        <Card.Img src={product.image} variant='top' />
+        <Card.Img src={formatImageUrl(product.image)} variant='top' />
       </Link>
       <Card.Body>
         <Link to={`/product/${product._id}`}>
@@ -22,7 +23,7 @@ export const Product: FunctionComponent<ProductProps> = ({ product }) => {
         </Link>
         <Card.Text as='div'>
           <Rating
-            value={product.rating}
+            value={product.rating!}
             text={`${product.numReviews} reviews`}
           />
         </Card.Text>

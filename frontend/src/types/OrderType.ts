@@ -1,4 +1,4 @@
-type OrderItemType = {
+export type OrderItemType = {
   _id: string;
   name: string;
   image: string;
@@ -25,9 +25,9 @@ export type OrderType = {
     name: string;
     email: string;
   };
-  isDelivered: boolean;
-  deliveredAt: Date;
-  isPaid: boolean;
-  paidAt: Date;
-  createdAt: Date;
+  isDelivered?: boolean;
+  deliveredAt?: Date;
+  isPaid?: boolean;
+  paidAt?: Date;
+  createdAt?: Date;
 };

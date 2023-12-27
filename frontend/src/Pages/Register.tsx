@@ -7,6 +7,7 @@ import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { Components } from '../components';
 import { Button, Form } from 'react-bootstrap';
+import { Types } from '../types';
 
 type RegisterFormValues = {
   name: string;
@@ -29,9 +30,13 @@ export const Register = () => {
     formState: { errors },
   } = useForm<RegisterFormValues>();
 
-  const { mutate: registerUser, isPending } = useMutation({
+  const { mutate: registerUser, isPending } = useMutation<
+    Types.User,
+    Error,
+    { name: string; email: string; password: string }
+  >({
     mutationKey: ['register'],
-    mutationFn: (data: { name: string; email: string; password: string }) => {
+    mutationFn: (data) => {
       return services.users.register(data.name, data.email, data.password);
     },
     onSuccess: (userInfo) => {

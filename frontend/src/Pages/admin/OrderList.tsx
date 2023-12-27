@@ -45,18 +45,18 @@ export const OrderList = () => {
               <tr key={order._id}>
                 <td>{order._id}</td>
                 <td>{order.user?.name}</td>
-                <td>{order.createdAt.toString().substring(0, 10)}</td>
+                <td>{order.createdAt?.toString().substring(0, 10)}</td>
                 <td>${formatCurrency(order.totalPrice)}</td>
                 <td>
                   {order.isPaid ? (
-                    order.paidAt.toString().substring(0, 10)
+                    order.paidAt?.toString().substring(0, 10)
                   ) : (
                     <FaTimes />
                   )}
                 </td>
                 <td>
                   {order.isDelivered ? (
-                    order.deliveredAt.toString().substring(0, 10)
+                    order.deliveredAt?.toString().substring(0, 10)
                   ) : (
                     <FaTimes style={{ color: 'red' }} />
                   )}

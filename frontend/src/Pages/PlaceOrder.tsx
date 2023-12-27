@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { CheckoutSteps } from '../components/CheckoutSteps';
 import { Button, Card, Col, Image, ListGroup, Row } from 'react-bootstrap';
 import { Components } from '../components';
-import { formatCurrency } from '../utils';
+import { formatCurrency, formatImageUrl } from '../utils';
 import { useMutation } from '@tanstack/react-query';
 import { Types } from '../types';
 import { services } from '../services';
@@ -23,9 +23,13 @@ export const PlaceOrder = () => {
     if (!cart.paymentMethod) navigate('/payment');
   }, [cart.paymentMethod, cart.shippingAddress, navigate]);
 
-  const { mutate: createOrder, isPending } = useMutation({
+  const { mutate: createOrder, isPending } = useMutation<
+    Types.Order,
+    Error,
+    Types.Order
+  >({
     mutationKey: ['createOrder'],
-    mutationFn: (order: Types.Order) => {
+    mutationFn: (order) => {
       return services.orders.createOrder(order);
     },
     onSuccess: (order) => {
@@ -45,9 +49,20 @@ export const PlaceOrder = () => {
   });
 
   const placeOrderHandler = () => {
+    const orderItems: Types.OrderItem[] = cart.cartItems.map((cartItem) => {
+      return {
+        _id: '',
+        image: cartItem.image,
+        name: cartItem.name,
+        price: cartItem.price,
+        product: cartItem._id,
+        qty: cartItem.qty,
+      };
+    });
+
     createOrder({
       itemsPrice: cart.itemsPrice,
-      orderItems: cart.cartItems,
+      orderItems,
       paymentMethod: cart.paymentMethod,
       shippingAddress: cart.shippingAddress!,
       shippingPrice: cart.shippingPrice,
@@ -87,7 +102,7 @@ export const PlaceOrder = () => {
                       <Row>
                         <Col md={1}>
                           <Image
-                            src={item.image}
+                            src={formatImageUrl(item.image)}
                             alt={item.name}
                             fluid
                             rounded

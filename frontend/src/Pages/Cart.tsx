@@ -11,7 +11,7 @@ import {
   Row,
 } from 'react-bootstrap';
 import { Components } from '../components';
-import { formatCurrency } from '../utils';
+import { formatCurrency, formatImageUrl } from '../utils';
 
 export const Cart = () => {
   const navigate = useNavigate();
@@ -48,7 +48,12 @@ export const Cart = () => {
               <ListGroup.Item key={item._id}>
                 <Row>
                   <Col md={2}>
-                    <Image src={item.image} alt={item.name} fluid rounded />
+                    <Image
+                      src={formatImageUrl(item.image)}
+                      alt={item.name}
+                      fluid
+                      rounded
+                    />
                   </Col>
                   <Col md={3}>
                     <Link to={`/product/${item._id}`}>{item.name}</Link>

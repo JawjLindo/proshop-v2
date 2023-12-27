@@ -10,10 +10,11 @@ import {
 } from 'react-bootstrap';
 import { Components } from '../components';
 import { useQuery } from '@tanstack/react-query';
-import { ProductType } from '../types/ProductType';
 import { services } from '../services';
 import { MouseEventHandler, useState } from 'react';
 import { useCartDispatch } from '../contexts';
+import { Types } from '../types';
+import { formatImageUrl } from '../utils';
 
 export const Product = () => {
   const navigate = useNavigate();
@@ -34,8 +35,8 @@ export const Product = () => {
     isLoading,
     isError,
     error,
-  } = useQuery<ProductType>({
-    queryKey: ['products', productId],
+  } = useQuery<Types.Product>({
+    queryKey: ['product', productId],
     queryFn: () => services.products.getProductById(productId),
   });
 
@@ -63,7 +64,11 @@ export const Product = () => {
         <>
           <Row>
             <Col md={5}>
-              <Image src={product?.image} alt={product?.name} fluid />
+              <Image
+                src={formatImageUrl(product?.image)}
+                alt={product?.name}
+                fluid
+              />
             </Col>
             <Col md={4}>
               <ListGroup variant='flush'>

@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { services } from '../services';
 import { Components } from '../components';
 import { Button, Card, Col, Image, ListGroup, Row } from 'react-bootstrap';
-import { formatCurrency } from '../utils';
+import { formatCurrency, formatImageUrl } from '../utils';
 import {
   PayPalButtons,
   SCRIPT_LOADING_STATE,
@@ -47,10 +47,13 @@ export const Order = () => {
     queryFn: () => services.orders.getPaypalClientId(),
   });
 
-  const { mutate: payOrder, isPending: loadingPay } = useMutation({
+  const { mutate: payOrder, isPending: loadingPay } = useMutation<
+    void,
+    Error,
+    Types.Order
+  >({
     mutationKey: ['payorder', orderId],
-    mutationFn: (details: any) =>
-      services.orders.payOrder(orderId, { ...details }),
+    mutationFn: (details) => services.orders.payOrder(orderId, { ...details }),
     onSuccess: () => {
       refetch();
       toast.success('Payment successful');
@@ -68,9 +71,13 @@ export const Order = () => {
     },
   });
 
-  const { mutate: deliverOrder, isPending: loadingDeliver } = useMutation({
+  const { mutate: deliverOrder, isPending: loadingDeliver } = useMutation<
+    void,
+    Error,
+    string
+  >({
     mutationKey: ['deliverOrder', orderId],
-    mutationFn: (orderId: string) => services.orders.deliverOrder(orderId),
+    mutationFn: (orderId) => services.orders.deliverOrder(orderId),
     onSuccess: () => {
       refetch();
       toast.success('Order delivered');
@@ -181,7 +188,7 @@ export const Order = () => {
                   </p>
                   {order?.isDelivered ? (
                     <Components.Message variant='success'>
-                      Delivered on {order.deliveredAt.toString()}
+                      Delivered on {order.deliveredAt?.toString()}
                     </Components.Message>
                   ) : (
                     <Components.Message variant='danger'>
@@ -197,7 +204,7 @@ export const Order = () => {
                   </p>
                   {order?.isPaid ? (
                     <Components.Message variant='success'>
-                      Paid on {order.paidAt.toString()}
+                      Paid on {order.paidAt?.toString()}
                     </Components.Message>
                   ) : (
                     <Components.Message variant='danger'>
@@ -212,7 +219,7 @@ export const Order = () => {
                       <Row>
                         <Col md={1}>
                           <Image
-                            src={item.image}
+                            src={formatImageUrl(item.image)}
                             alt={item.name}
                             fluid
                             rounded

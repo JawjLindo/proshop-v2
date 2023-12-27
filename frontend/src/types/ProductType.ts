@@ -7,6 +7,6 @@ export type ProductType = {
   category: string;
   price: number;
   countInStock: number;
-  rating: number;
-  numReviews: number;
+  rating?: number;
+  numReviews?: number;
 };

@@ -49,4 +49,9 @@ export const router = createBrowserRouter([
     element: <Components.Layout isSecure isAdmin />,
     children: [{ path: '', element: <Pages.ProductList /> }],
   },
+  {
+    path: '/admin/product/:id/edit',
+    element: <Components.Layout isSecure isAdmin />,
+    children: [{ path: '', element: <Pages.ProductEdit /> }],
+  },
 ]);

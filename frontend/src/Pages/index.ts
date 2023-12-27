@@ -8,8 +8,7 @@ import { Payment } from './Payment';
 import { PlaceOrder } from './PlaceOrder';
 import { Order } from './Order';
 import { Profile } from './Profile';
-import { OrderList } from './admin/OrderList';
-import { ProductList } from './admin/ProductList';
+import { OrderList, ProductEdit, ProductList } from './admin';
 
 export const Pages = {
   Home,
@@ -24,4 +23,5 @@ export const Pages = {
   Profile,
   OrderList,
   ProductList,
+  ProductEdit,
 };

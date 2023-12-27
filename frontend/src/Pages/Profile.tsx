@@ -29,9 +29,13 @@ export const Profile = () => {
     formState: { errors },
   } = useForm<UpdateProfileFormValues>();
 
-  const { mutate: updateProfile, isPending } = useMutation({
+  const { mutate: updateProfile, isPending } = useMutation<
+    Types.User,
+    Error,
+    { name: string; email: string; password: string }
+  >({
     mutationKey: ['updateProfile', userInfo!._id],
-    mutationFn: (data: { name: string; email: string; password: string }) =>
+    mutationFn: (data) =>
       services.users.updateProfile(
         userInfo!._id,
         data.name,
@@ -161,18 +165,18 @@ export const Profile = () => {
               {orders?.map((order) => (
                 <tr key={order._id}>
                   <td>{order._id}</td>
-                  <td>{order.createdAt.toString().substring(0, 10)}</td>
+                  <td>{order.createdAt?.toString().substring(0, 10)}</td>
                   <td>${formatCurrency(order.totalPrice)}</td>
                   <td>
                     {order.isPaid ? (
-                      order.createdAt.toString().substring(0, 10)
+                      order.createdAt?.toString().substring(0, 10)
                     ) : (
                       <FaTimes style={{ color: 'red' }} />
                     )}
                   </td>
                   <td>
                     {order.isDelivered ? (
-                      order.deliveredAt.toString().substring(0, 10)
+                      order.deliveredAt?.toString().substring(0, 10)
                     ) : (
                       <FaTimes style={{ color: 'red' }} />
                     )}
