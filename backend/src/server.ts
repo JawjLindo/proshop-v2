@@ -7,6 +7,7 @@ import 'colors';
 import { setupRoutes } from './routes';
 import { connectDb } from './config';
 import { Middleware } from './middleware';
+import path from 'path';
 
 dotenv.config();
 
@@ -23,6 +24,8 @@ const configureApp = () => {
       credentials: true,
     })
   );
+  const __dirname = path.resolve();
+  app.use('/images', express.static(path.join(__dirname, '/images')));
   setupRoutes(app);
   Middleware.setupErrorHandlers(app);
 };

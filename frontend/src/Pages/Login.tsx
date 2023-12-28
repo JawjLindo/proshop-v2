@@ -3,12 +3,12 @@ import { Button, Col, Form, Row } from 'react-bootstrap';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { services } from '../services';
-import { useAuthDispatch, useAuthValue } from '../contexts';
 import { useEffect } from 'react';
-import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { Components } from '../components';
 import { Types } from '../types';
+import { formatError } from '../utils';
+import { useAuth } from '../stores';
 
 type LoginFormValues = {
   email: string;
@@ -27,8 +27,8 @@ export const Login = () => {
     register,
   } = useForm<LoginFormValues>();
 
-  const dispatch = useAuthDispatch();
-  const { userInfo } = useAuthValue();
+  const setCredentials = useAuth((state) => state.setCredentials);
+  const userInfo = useAuth((state) => state.userInfo);
 
   useEffect(() => {
     if (userInfo) {
@@ -46,19 +46,10 @@ export const Login = () => {
       return services.users.login(data.email, data.password);
     },
     onSuccess: (userInfo) => {
-      dispatch({ type: 'auth/setCredentials', payload: userInfo });
+      setCredentials(userInfo);
       navigate(redirect);
     },
-    onError: (error) => {
-      if (error instanceof AxiosError) {
-        toast.error(
-          ((error as AxiosError).response?.data as { message: string })
-            .message || error.message
-        );
-      } else {
-        toast.error((error as Error).message);
-      }
-    },
+    onError: (error) => toast.error(formatError(error)),
   });
 
   const onSubmit: SubmitHandler<LoginFormValues> = (data) => {

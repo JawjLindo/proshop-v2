@@ -1,9 +1,10 @@
 import { Button, Form } from 'react-bootstrap';
 import { Components } from '../components';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useCartDispatch, useCartValue } from '../contexts';
+// import { useCartDispatch, useCartValue } from '../contexts';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useCart } from '../stores';
 
 type ShippingFormValues = {
   address: string;
@@ -15,8 +16,8 @@ type ShippingFormValues = {
 export const Shipping = () => {
   const navigate = useNavigate();
 
-  const dispatch = useCartDispatch();
-  const { shippingAddress } = useCartValue();
+  const shippingAddress = useCart((state) => state.shippingAddress);
+  const updateShippingAddress = useCart((state) => state.updateShippingAddress);
 
   const {
     register,
@@ -25,14 +26,11 @@ export const Shipping = () => {
   } = useForm<ShippingFormValues>();
 
   const onSubmit: SubmitHandler<ShippingFormValues> = (data) => {
-    dispatch({
-      type: 'cart/updateShippingAddress',
-      payload: {
-        address: data.address,
-        city: data.city,
-        postalCode: data.postalCode,
-        country: data.country,
-      },
+    updateShippingAddress({
+      address: data.address,
+      city: data.city,
+      postalCode: data.postalCode,
+      country: data.country,
     });
     navigate('/payment');
   };

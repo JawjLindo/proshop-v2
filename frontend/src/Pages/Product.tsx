@@ -12,9 +12,9 @@ import { Components } from '../components';
 import { useQuery } from '@tanstack/react-query';
 import { services } from '../services';
 import { MouseEventHandler, useState } from 'react';
-import { useCartDispatch } from '../contexts';
 import { Types } from '../types';
 import { formatImageUrl } from '../utils';
+import { useCart } from '../stores';
 
 export const Product = () => {
   const navigate = useNavigate();
@@ -40,11 +40,11 @@ export const Product = () => {
     queryFn: () => services.products.getProductById(productId),
   });
 
-  const dispatch = useCartDispatch();
+  const addItemToCart = useCart((state) => state.addItem);
 
   const addToCartHandler: MouseEventHandler<HTMLButtonElement> = () => {
     if (product) {
-      dispatch({ type: 'cart/addItem', payload: { ...product, qty } });
+      addItemToCart({ ...product, qty });
       navigate('/cart');
     }
   };

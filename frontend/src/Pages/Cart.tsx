@@ -1,6 +1,6 @@
 import { FaTrash } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
-import { CartItem, useCartDispatch, useCartValue } from '../contexts';
+// import { CartItem, useCartDispatch, useCartValue } from '../contexts';
 import {
   Button,
   Card,
@@ -12,22 +12,25 @@ import {
 } from 'react-bootstrap';
 import { Components } from '../components';
 import { formatCurrency, formatImageUrl } from '../utils';
+import { CartItem, useCart } from '../stores';
 
 export const Cart = () => {
   const navigate = useNavigate();
 
-  const dispatch = useCartDispatch();
-  const { cartItems, itemsPrice } = useCartValue();
+  const cartItems = useCart((state) => state.cartItems);
+  const itemsPrice = useCart((state) => state.itemsPrice);
+  const addItemToCart = useCart((state) => state.addItem);
+  const removeItemFromCart = useCart((state) => state.removeItem);
 
   const addToCartHandler: (item: CartItem, qty: number) => void = (
     item,
     qty
   ) => {
-    dispatch({ type: 'cart/addItem', payload: { ...item, qty } });
+    addItemToCart({ ...item, qty });
   };
 
   const removeFromCartHandler: (id: string) => void = (id) => {
-    dispatch({ type: 'cart/removeItem', payload: id });
+    removeItemFromCart(id);
   };
 
   const checkoutHandler = () => {

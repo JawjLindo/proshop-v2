@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { services } from '../services';
 import { Components } from '../components';
 import { Button, Card, Col, Image, ListGroup, Row } from 'react-bootstrap';
-import { formatCurrency, formatImageUrl } from '../utils';
+import { formatCurrency, formatError, formatImageUrl } from '../utils';
 import {
   PayPalButtons,
   SCRIPT_LOADING_STATE,
@@ -11,9 +11,8 @@ import {
 } from '@paypal/react-paypal-js';
 import { MouseEventHandler, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { AxiosError } from 'axios';
 import { Types } from '../types';
-import { useAuthValue } from '../contexts';
+import { useAuth } from '../stores';
 
 export const Order = () => {
   const { id: idParam } = useParams();
@@ -25,7 +24,7 @@ export const Order = () => {
     );
   const orderId = idParam!;
 
-  const { userInfo } = useAuthValue();
+  const userInfo = useAuth((state) => state.userInfo);
 
   const {
     data: order,
@@ -58,17 +57,7 @@ export const Order = () => {
       refetch();
       toast.success('Payment successful');
     },
-    onError: (error) => {
-      let errorMessage: string;
-      if (error instanceof AxiosError) {
-        errorMessage =
-          ((error as AxiosError).response?.data as { message: string })
-            .message || error.message;
-      } else {
-        errorMessage = (error as Error).message;
-      }
-      toast.error(errorMessage);
-    },
+    onError: (error) => toast.error(formatError(error)),
   });
 
   const { mutate: deliverOrder, isPending: loadingDeliver } = useMutation<
@@ -82,17 +71,7 @@ export const Order = () => {
       refetch();
       toast.success('Order delivered');
     },
-    onError: (error) => {
-      let errorMessage: string;
-      if (error instanceof AxiosError) {
-        errorMessage =
-          ((error as AxiosError).response?.data as { message: string })
-            .message || error.message;
-      } else {
-        errorMessage = (error as Error).message;
-      }
-      toast.error(errorMessage);
-    },
+    onError: (error) => toast.error(formatError(error)),
   });
 
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
@@ -134,7 +113,7 @@ export const Order = () => {
         purchase_units: [
           {
             amount: {
-              value: order?.totalPrice,
+              value: Number(formatCurrency(order?.totalPrice)),
             },
           },
         ],

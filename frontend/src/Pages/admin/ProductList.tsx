@@ -4,10 +4,10 @@ import { Types } from '../../types';
 import { Button, Col, Row, Table } from 'react-bootstrap';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Components } from '../../components';
-import { formatCurrency } from '../../utils';
+import { formatCurrency, formatError } from '../../utils';
 import { LinkContainer } from 'react-router-bootstrap';
-import { AxiosError } from 'axios';
 import { MouseEventHandler, useState } from 'react';
+import { toast } from 'react-toastify';
 
 export const ProductList = () => {
   const [errorText, setErrorText] = useState<string | null>();
@@ -23,25 +23,35 @@ export const ProductList = () => {
     queryFn: () => services.products.getProducts(),
   });
 
-  const { mutate: createProduct, isPending } = useMutation<Types.Product>({
-    mutationKey: ['createProduct'],
-    mutationFn: () => services.products.createProduct(),
+  const { mutate: createProduct, isPending: loadingCreate } =
+    useMutation<Types.Product>({
+      mutationKey: ['createProduct'],
+      mutationFn: () => services.products.createProduct(),
+      onSuccess: () => {
+        refetch();
+      },
+      onError: (error) => setErrorText(formatError(error)),
+    });
+
+  const { mutate: deleteProduct, isPending: loadingDelete } = useMutation<
+    { message: string },
+    Error,
+    string
+  >({
+    mutationKey: ['deleteProduct'],
+    mutationFn: (productId) => services.products.deleteProduct(productId),
     onSuccess: () => {
+      toast.success('Product deleted');
       refetch();
     },
-    onError: () => {
-      if (error instanceof AxiosError) {
-        setErrorText(
-          ((error as AxiosError).response?.data as { message: string })
-            .message || error.message
-        );
-      } else {
-        setErrorText((error as Error).message);
-      }
-    },
+    onError: (error) => setErrorText(formatError(error)),
   });
 
-  const deleteHandler = (_productId: string) => {};
+  const deleteHandler = (productId: string) => {
+    if (window.confirm('Are you sure?')) {
+      deleteProduct(productId);
+    }
+  };
 
   const createProductHandler: MouseEventHandler<HTMLButtonElement> = () => {
     if (window.confirm('Are you sure you want to create a new product?')) {
@@ -64,7 +74,8 @@ export const ProductList = () => {
           </Button>
         </Col>
       </Row>
-      {isLoading || isPending ? (
+      {(loadingCreate || loadingDelete) && <Components.Loader />}
+      {isLoading ? (
         <Components.Loader />
       ) : isError ? (
         <Components.Message variant='danger'>

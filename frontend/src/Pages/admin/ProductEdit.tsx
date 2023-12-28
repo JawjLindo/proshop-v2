@@ -7,7 +7,8 @@ import { AxiosError } from 'axios';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Button, Form } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { ChangeEvent, ChangeEventHandler, MouseEventHandler } from 'react';
+import { ChangeEventHandler } from 'react';
+import { formatError } from '../../utils';
 
 type EditProductFormValues = {
   name: string;
@@ -50,24 +51,14 @@ export const ProductEdit = () => {
     mutationKey: ['product', productId],
     mutationFn: (product) => services.products.updateProduct(product),
     onSuccess: () => {
-      //queryClient.invalidateQueries({ queryKey: ['product', productId] });
       queryClient.removeQueries({ queryKey: ['product', productId] });
       toast.success('Product updated');
       navigate('/admin/productlist');
     },
-    onError: (error) => {
-      if (error instanceof AxiosError) {
-        toast.error(
-          ((error as AxiosError).response?.data as { message: string })
-            .message || error.message
-        );
-      } else {
-        toast.error((error as Error).message);
-      }
-    },
+    onError: (error) => toast.error(formatError(error)),
   });
 
-  const { mutate: uploadProductImage, isPending: loadingUpload } = useMutation<
+  const { mutate: uploadProductImage } = useMutation<
     { message: string; image: string },
     AxiosError,
     File

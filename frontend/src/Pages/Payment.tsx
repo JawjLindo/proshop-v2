@@ -1,9 +1,9 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Components } from '../components';
-import { useCartDispatch, useCartValue } from '../contexts';
 import { Button, Col, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { useCart } from '../stores';
 
 type PaymentFormValues = {
   paymentMethod: string;
@@ -12,13 +12,14 @@ type PaymentFormValues = {
 export const Payment = () => {
   const navigate = useNavigate();
 
-  const dispatch = useCartDispatch();
-  const { shippingAddress, paymentMethod } = useCartValue();
+  const shippingAddress = useCart((state) => state.shippingAddress);
+  const paymentMethod = useCart((state) => state.paymentMethod);
+  const updatePaymentMethod = useCart((state) => state.updatePaymentMethod);
 
   const { handleSubmit, register } = useForm<PaymentFormValues>();
 
   const onSubmit: SubmitHandler<PaymentFormValues> = (data) => {
-    dispatch({ type: 'cart/updatePaymentMethod', payload: data.paymentMethod });
+    updatePaymentMethod(data.paymentMethod);
     navigate('/placeorder');
   };
 

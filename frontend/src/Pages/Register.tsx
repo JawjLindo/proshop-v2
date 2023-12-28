@@ -2,12 +2,12 @@ import { useMutation } from '@tanstack/react-query';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { services } from '../services';
-import { useAuthDispatch } from '../contexts';
-import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { Components } from '../components';
 import { Button, Form } from 'react-bootstrap';
 import { Types } from '../types';
+import { formatError } from '../utils';
+import { useAuth } from '../stores';
 
 type RegisterFormValues = {
   name: string;
@@ -22,7 +22,7 @@ export const Register = () => {
   const sp = new URLSearchParams(search);
   const redirect = sp.get('redirect') || '/';
 
-  const dispatch = useAuthDispatch();
+  const setCredentials = useAuth((state) => state.setCredentials);
 
   const {
     register,
@@ -40,19 +40,10 @@ export const Register = () => {
       return services.users.register(data.name, data.email, data.password);
     },
     onSuccess: (userInfo) => {
-      dispatch({ type: 'auth/setCredentials', payload: userInfo });
+      setCredentials(userInfo);
       navigate(redirect);
     },
-    onError: (error) => {
-      if (error instanceof AxiosError) {
-        toast.error(
-          ((error as AxiosError).response?.data as { message: string })
-            .message || error.message
-        );
-      } else {
-        toast.error((error as Error).message);
-      }
-    },
+    onError: (error) => toast.error(formatError(error)),
   });
 
   const onSubmit: SubmitHandler<RegisterFormValues> = (data) => {

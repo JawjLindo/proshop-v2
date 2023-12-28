@@ -52,10 +52,20 @@ const uploadProductImage: (
   return data;
 };
 
+const deleteProduct: (id: string) => Promise<{ message: string }> = async (
+  id
+) => {
+  const { data } = await createApiClient().delete<{ message: string }>(
+    `${PRODUCTS_API_URL}/${id}`
+  );
+  return data;
+};
+
 export const products = {
   getProducts,
   getProductById,
   createProduct,
   updateProduct,
   uploadProductImage,
+  deleteProduct,
 };

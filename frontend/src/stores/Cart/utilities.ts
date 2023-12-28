@@ -10,5 +10,5 @@ export const updateCart: (draft: Draft<CartState>) => void = (draft) => {
   draft.taxPrice = draft.itemsPrice * 0.15;
   draft.totalPrice = draft.itemsPrice + draft.shippingPrice + draft.taxPrice;
 
-  localStorage.setItem('cart', JSON.stringify(draft));
+  // localStorage.setItem('cart', JSON.stringify(draft));
 };

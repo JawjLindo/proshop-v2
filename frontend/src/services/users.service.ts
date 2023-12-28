@@ -71,9 +71,41 @@ const updateProfile: (
   };
 };
 
+const getUsers: () => Promise<Types.User[]> = async () => {
+  const { data } = await createApiClient().get<Types.User[]>(USERS_API_URL);
+  return data;
+};
+
+const getUserDetails: (id: string) => Promise<Types.User> = async (id) => {
+  const { data } = await createApiClient().get<Types.User>(
+    `${USERS_API_URL}/${id}`
+  );
+  return data;
+};
+
+const deleteUser: (id: string) => Promise<{ message: string }> = async (id) => {
+  const { data } = await createApiClient().delete<{ message: string }>(
+    `${USERS_API_URL}/${id}`
+  );
+  return data;
+};
+
+const updateUser: (user: Types.User) => Promise<Types.User> = async (user) => {
+  const { data } = await createApiClient().put<
+    Types.User,
+    AxiosResponse<Types.User, any>,
+    Types.User
+  >(`${USERS_API_URL}/${user._id}`, user);
+  return data;
+};
+
 export const users = {
   login,
   logout,
   register,
   updateProfile,
+  getUsers,
+  getUserDetails,
+  deleteUser,
+  updateUser,
 };

@@ -1,27 +1,32 @@
 import { useEffect, useState } from 'react';
-import { useCartDispatch, useCartValue } from '../contexts';
 import { Link, useNavigate } from 'react-router-dom';
 import { CheckoutSteps } from '../components/CheckoutSteps';
 import { Button, Card, Col, Image, ListGroup, Row } from 'react-bootstrap';
 import { Components } from '../components';
-import { formatCurrency, formatImageUrl } from '../utils';
+import { formatCurrency, formatError, formatImageUrl } from '../utils';
 import { useMutation } from '@tanstack/react-query';
 import { Types } from '../types';
 import { services } from '../services';
-import { AxiosError } from 'axios';
+import { useCart } from '../stores';
 
 export const PlaceOrder = () => {
   const navigate = useNavigate();
 
   const [errorText, setErrorText] = useState<string | null>();
 
-  const cartDispatch = useCartDispatch();
-  const cart = useCartValue();
+  const cartItems = useCart((state) => state.cartItems);
+  const shippingAddress = useCart((state) => state.shippingAddress);
+  const itemsPrice = useCart((state) => state.itemsPrice);
+  const paymentMethod = useCart((state) => state.paymentMethod);
+  const shippingPrice = useCart((state) => state.shippingPrice);
+  const taxPrice = useCart((state) => state.taxPrice);
+  const totalPrice = useCart((state) => state.totalPrice);
+  const clearCartItems = useCart((state) => state.clearItems);
 
   useEffect(() => {
-    if (!cart.shippingAddress) navigate('/shipping');
-    if (!cart.paymentMethod) navigate('/payment');
-  }, [cart.paymentMethod, cart.shippingAddress, navigate]);
+    if (!shippingAddress) navigate('/shipping');
+    if (!paymentMethod) navigate('/payment');
+  }, [paymentMethod, shippingAddress, navigate]);
 
   const { mutate: createOrder, isPending } = useMutation<
     Types.Order,
@@ -33,25 +38,16 @@ export const PlaceOrder = () => {
       return services.orders.createOrder(order);
     },
     onSuccess: (order) => {
-      cartDispatch({ type: 'cart/clearItems' });
+      clearCartItems();
       navigate(`/order/${order._id}`);
     },
-    onError: (error) => {
-      if (error instanceof AxiosError) {
-        setErrorText(
-          ((error as AxiosError).response?.data as { message: string })
-            .message || error.message
-        );
-      } else {
-        setErrorText((error as Error).message);
-      }
-    },
+    onError: (error) => setErrorText(formatError(error)),
   });
 
   const placeOrderHandler = () => {
-    const orderItems: Types.OrderItem[] = cart.cartItems.map((cartItem) => {
+    const orderItems: Types.OrderItem[] = cartItems.map((cartItem) => {
       return {
-        _id: '',
+        _id: cartItem._id,
         image: cartItem.image,
         name: cartItem.name,
         price: cartItem.price,
@@ -61,13 +57,13 @@ export const PlaceOrder = () => {
     });
 
     createOrder({
-      itemsPrice: cart.itemsPrice,
+      itemsPrice,
       orderItems,
-      paymentMethod: cart.paymentMethod,
-      shippingAddress: cart.shippingAddress!,
-      shippingPrice: cart.shippingPrice,
-      taxPrice: cart.taxPrice,
-      totalPrice: cart.taxPrice,
+      paymentMethod,
+      shippingAddress: shippingAddress!,
+      shippingPrice,
+      taxPrice,
+      totalPrice,
     });
   };
 
@@ -81,23 +77,22 @@ export const PlaceOrder = () => {
               <h2>Shipping</h2>
               <p>
                 <strong>Address: </strong>
-                {cart.shippingAddress?.address}, {cart.shippingAddress?.city}{' '}
-                {cart.shippingAddress?.postalCode},{' '}
-                {cart.shippingAddress?.country}
+                {shippingAddress?.address}, {shippingAddress?.city}{' '}
+                {shippingAddress?.postalCode}, {shippingAddress?.country}
               </p>
             </ListGroup.Item>
             <ListGroup.Item>
               <h2>Payment Method</h2>
               <strong>Method: </strong>
-              {cart.paymentMethod}
+              {paymentMethod}
             </ListGroup.Item>
             <ListGroup.Item>
               <h2>Order Items</h2>
-              {cart.cartItems.length === 0 ? (
+              {cartItems.length === 0 ? (
                 <Components.Message>Your cart is empty</Components.Message>
               ) : (
                 <ListGroup variant='flush'>
-                  {cart.cartItems.map((item, index) => (
+                  {cartItems.map((item, index) => (
                     <ListGroup.Item key={index}>
                       <Row>
                         <Col md={1}>
@@ -132,25 +127,25 @@ export const PlaceOrder = () => {
               <ListGroup.Item>
                 <Row>
                   <Col>Items:</Col>
-                  <Col>${formatCurrency(cart.itemsPrice)}</Col>
+                  <Col>${formatCurrency(itemsPrice)}</Col>
                 </Row>
               </ListGroup.Item>
               <ListGroup.Item>
                 <Row>
                   <Col>Shipping:</Col>
-                  <Col>${formatCurrency(cart.shippingPrice)}</Col>
+                  <Col>${formatCurrency(shippingPrice)}</Col>
                 </Row>
               </ListGroup.Item>
               <ListGroup.Item>
                 <Row>
                   <Col>Tax:</Col>
-                  <Col>${formatCurrency(cart.taxPrice)}</Col>
+                  <Col>${formatCurrency(taxPrice)}</Col>
                 </Row>
               </ListGroup.Item>
               <ListGroup.Item>
                 <Row>
                   <Col>Total:</Col>
-                  <Col>${formatCurrency(cart.totalPrice)}</Col>
+                  <Col>${formatCurrency(totalPrice)}</Col>
                 </Row>
               </ListGroup.Item>
               <ListGroup.Item>
@@ -164,7 +159,7 @@ export const PlaceOrder = () => {
                 <Button
                   type='button'
                   className='btn-block'
-                  disabled={cart.cartItems.length === 0}
+                  disabled={cartItems.length === 0}
                   onClick={placeOrderHandler}
                 >
                   Place Order

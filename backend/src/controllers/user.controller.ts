@@ -95,19 +95,60 @@ const updateUserProfile = Middleware.asyncHandler(async (req, res) => {
 });
 
 const getUsers = Middleware.asyncHandler(async (_req, res) => {
-  res.send('get users');
+  const users = await Models.User.find({});
+  res.status(200).json(users);
 });
 
-const deleteUser = Middleware.asyncHandler(async (_req, res) => {
-  res.send('delete user');
+const deleteUser = Middleware.asyncHandler(async (req, res) => {
+  const user = await Models.User.findById(req.params.id);
+
+  if (user) {
+    if (user.isAdmin) {
+      res.status(400);
+      throw new Error('Cannot delete admin user');
+    }
+
+    await Models.User.deleteOne({ _id: user._id });
+    res.status(200).json({ message: 'User deleted' });
+  } else {
+    res.status(404);
+    throw new Error('User not found');
+  }
 });
 
-const getUserById = Middleware.asyncHandler(async (_req, res) => {
-  res.send('get user by id');
+const getUserById = Middleware.asyncHandler(async (req, res) => {
+  const user = await Models.User.findById(req.params.id).select('-password');
+
+  if (user) {
+    res.status(200).json(user);
+  } else {
+    res.status(404);
+    throw new Error('User not found');
+  }
 });
 
-const updateUser = Middleware.asyncHandler(async (_req, res) => {
-  res.send('update user');
+const updateUser = Middleware.asyncHandler(async (req, res) => {
+  const user = await Models.User.findById(req.params.id);
+
+  if (user) {
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+
+    if (req.user?._id.toString() != user._id.toString()) {
+      user.isAdmin = Boolean(req.body.isAdmin);
+    }
+
+    const updatedUser = await user.save();
+    res.status(200).json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      isAdmin: updatedUser.isAdmin,
+    });
+  } else {
+    res.status(404);
+    throw new Error('User not found');
+  }
 });
 
 export const userController = {

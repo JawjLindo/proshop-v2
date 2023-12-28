@@ -5,7 +5,7 @@ import { Header } from './Header';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/ReactToastify.min.css';
 import { FunctionComponent, useEffect } from 'react';
-import { useAuthValue } from '../../contexts';
+import { useAuth } from '../../stores';
 
 type LayoutProps = {
   isSecure?: boolean;
@@ -16,7 +16,7 @@ export const Layout: FunctionComponent<LayoutProps> = ({
   isSecure = false,
   isAdmin = false,
 }) => {
-  const { userInfo } = useAuthValue();
+  const userInfo = useAuth((state) => state.userInfo);
   const navigate = useNavigate();
 
   useEffect(() => {

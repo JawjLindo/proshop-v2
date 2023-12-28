@@ -42,16 +42,26 @@ export const router = createBrowserRouter([
   {
     path: '/admin/orderlist',
     element: <Components.Layout isSecure isAdmin />,
-    children: [{ path: '', element: <Pages.OrderList /> }],
+    children: [{ path: '', element: <Pages.Admin.OrderList /> }],
   },
   {
     path: '/admin/productlist',
     element: <Components.Layout isSecure isAdmin />,
-    children: [{ path: '', element: <Pages.ProductList /> }],
+    children: [{ path: '', element: <Pages.Admin.ProductList /> }],
   },
   {
     path: '/admin/product/:id/edit',
     element: <Components.Layout isSecure isAdmin />,
-    children: [{ path: '', element: <Pages.ProductEdit /> }],
+    children: [{ path: '', element: <Pages.Admin.ProductEdit /> }],
+  },
+  {
+    path: '/admin/userlist',
+    element: <Components.Layout isSecure isAdmin />,
+    children: [{ path: '', element: <Pages.Admin.UserList /> }],
+  },
+  {
+    path: '/admin/user/:id/edit',
+    element: <Components.Layout isSecure isAdmin />,
+    children: [{ path: '', element: <Pages.Admin.UserEdit /> }],
   },
 ]);

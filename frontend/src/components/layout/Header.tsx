@@ -2,18 +2,18 @@ import { Badge, Container, Nav, NavDropdown, Navbar } from 'react-bootstrap';
 import { FaShoppingCart, FaUser } from 'react-icons/fa';
 import logo from '../../assets/logo.png';
 import { LinkContainer } from 'react-router-bootstrap';
-import { useAuthDispatch, useAuthValue, useCartValue } from '../../contexts';
 import { useMutation } from '@tanstack/react-query';
 import { services } from '../../services';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
+import { useAuth, useCart } from '../../stores';
 
 export const Header = () => {
   const navigate = useNavigate();
 
-  const { userInfo } = useAuthValue();
-  const authDispatch = useAuthDispatch();
-  const { cartItems } = useCartValue();
+  const userInfo = useAuth((state) => state.userInfo);
+  const logoutAction = useAuth((state) => state.logout);
+  const cartItems = useCart((state) => state.cartItems);
 
   const { mutate: logout } = useMutation<void, AxiosError, void>({
     mutationKey: ['logout'],
@@ -21,7 +21,7 @@ export const Header = () => {
       return services.users.logout();
     },
     onSuccess: () => {
-      authDispatch({ type: 'auth/logout' });
+      logoutAction();
       navigate('/');
     },
     onError: (error) => {

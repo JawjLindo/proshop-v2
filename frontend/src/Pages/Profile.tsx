@@ -1,16 +1,15 @@
 import { Button, Col, Form, Row, Table } from 'react-bootstrap';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useAuthDispatch, useAuthValue } from '../contexts';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { services } from '../services';
-import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { Loader } from '../components/Loader';
 import { Components } from '../components';
-import { formatCurrency } from '../utils';
+import { formatCurrency, formatError } from '../utils';
 import { FaTimes } from 'react-icons/fa';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Types } from '../types';
+import { useAuth } from '../stores';
 
 type UpdateProfileFormValues = {
   name: string;
@@ -20,8 +19,8 @@ type UpdateProfileFormValues = {
 };
 
 export const Profile = () => {
-  const { userInfo } = useAuthValue();
-  const dispatch = useAuthDispatch();
+  const userInfo = useAuth((state) => state.userInfo);
+  const setCredentials = useAuth((state) => state.setCredentials);
 
   const {
     register,
@@ -43,19 +42,10 @@ export const Profile = () => {
         data.password
       ),
     onSuccess: (userInfo) => {
-      dispatch({ type: 'auth/setCredentials', payload: userInfo });
+      setCredentials(userInfo);
       toast.success('Profile updated successfully');
     },
-    onError: (error) => {
-      if (error instanceof AxiosError) {
-        toast.error(
-          ((error as AxiosError).response?.data as { message: string })
-            .message || error.message
-        );
-      } else {
-        toast.error((error as Error).message);
-      }
-    },
+    onError: (error) => toast.error(formatError(error)),
   });
 
   const {
