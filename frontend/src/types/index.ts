@@ -1,4 +1,4 @@
-import type { ProductType } from './ProductType';
+import type { ProductType, ReviewType } from './ProductType';
 import type { UserType } from './UserType';
 import type { OrderType, OrderItemType } from './OrderType';
 
@@ -7,4 +7,5 @@ export namespace Types {
   export type User = UserType;
   export type Order = OrderType;
   export type OrderItem = OrderItemType;
+  export type Review = ReviewType;
 }

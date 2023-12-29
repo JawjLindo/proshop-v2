@@ -8,6 +8,9 @@ export const router = createBrowserRouter([
     element: <Components.Layout />,
     children: [
       { path: '', element: <Pages.Home /> },
+      { path: 'page/:pageNumber', element: <Pages.Home /> },
+      { path: 'search/:keyword', element: <Pages.Home /> },
+      { path: 'search/:keyword/page/:pageNumber', element: <Pages.Home /> },
       { path: 'product/:id', element: <Pages.Product /> },
       { path: 'cart', element: <Pages.Cart /> },
       { path: 'login', element: <Pages.Login /> },
@@ -46,6 +49,16 @@ export const router = createBrowserRouter([
   },
   {
     path: '/admin/productlist',
+    element: <Components.Layout isSecure isAdmin />,
+    children: [{ path: '', element: <Pages.Admin.ProductList /> }],
+  },
+  {
+    path: '/admin/productlist/:pageNumber',
+    element: <Components.Layout isSecure isAdmin />,
+    children: [{ path: '', element: <Pages.Admin.ProductList /> }],
+  },
+  {
+    path: '/search/:keyword/admin/productlist/:pageNumber',
     element: <Components.Layout isSecure isAdmin />,
     children: [{ path: '', element: <Pages.Admin.ProductList /> }],
   },

@@ -7,6 +7,7 @@ import { services } from '../../services';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { useAuth, useCart } from '../../stores';
+import { SearchBox } from '../SearchBox';
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ export const Header = () => {
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='ms-auto'>
+              <SearchBox />
               <LinkContainer to='/cart'>
                 <Nav.Link>
                   <FaShoppingCart /> Cart

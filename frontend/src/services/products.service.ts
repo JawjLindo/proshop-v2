@@ -5,9 +5,18 @@ import { createApiClient } from './apiClient';
 const PRODUCTS_API_URL = '/products';
 const UPLOAD_API_URL = '/upload';
 
-const getProducts: () => Promise<Types.Product[]> = async () => {
-  const { data } = await createApiClient().get<Types.Product[]>(
-    PRODUCTS_API_URL
+type GetProductsType = {
+  products: Types.Product[];
+  page: number;
+  pages: number;
+};
+const getProducts: (
+  pageNumber: number,
+  keyword?: string
+) => Promise<GetProductsType> = async (pageNumber, keyword) => {
+  const { data } = await createApiClient().get<GetProductsType>(
+    PRODUCTS_API_URL,
+    { params: { pageNumber, keyword } }
   );
   return data;
 };
@@ -61,6 +70,26 @@ const deleteProduct: (id: string) => Promise<{ message: string }> = async (
   return data;
 };
 
+const createReview: (
+  productId: string,
+  rating: number,
+  comment: string
+) => Promise<Types.Product> = async (productId, rating, comment) => {
+  const { data } = await createApiClient().post<
+    Types.Product,
+    AxiosResponse<Types.Product, any>,
+    { productId: string; rating: number; comment: string }
+  >(`${PRODUCTS_API_URL}/${productId}/reviews`, { productId, rating, comment });
+  return data;
+};
+
+const getTopProducts: () => Promise<Types.Product[]> = async () => {
+  const { data } = await createApiClient().get<Types.Product[]>(
+    `${PRODUCTS_API_URL}/top`
+  );
+  return data;
+};
+
 export const products = {
   getProducts,
   getProductById,
@@ -68,4 +97,8 @@ export const products = {
   updateProduct,
   uploadProductImage,
   deleteProduct,
+  createReview,
+  getTopProducts,
 };
+
+export type { GetProductsType };

@@ -1,7 +1,7 @@
-import { Document, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 import { IUser } from './user.model';
 
-interface IReviewModel {
+export interface IReviewModel {
   name: string;
   rating: number;
   comment: string;

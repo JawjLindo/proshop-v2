@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { services } from '../../services';
+import { GetProductsType, services } from '../../services';
 import { Types } from '../../types';
 import { Button, Col, Row, Table } from 'react-bootstrap';
 import { FaEdit, FaTrash } from 'react-icons/fa';
@@ -8,19 +8,23 @@ import { formatCurrency, formatError } from '../../utils';
 import { LinkContainer } from 'react-router-bootstrap';
 import { MouseEventHandler, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useParams } from 'react-router-dom';
 
 export const ProductList = () => {
+  const { pageNumber: pageNumberParam, keyword } = useParams();
+  const pageNumber = pageNumberParam ? Number(pageNumberParam) : 1;
+
   const [errorText, setErrorText] = useState<string | null>();
 
   const {
-    data: products,
+    data: productData,
     isLoading,
     isError,
     error,
     refetch,
-  } = useQuery<Types.Product[]>({
-    queryKey: ['products'],
-    queryFn: () => services.products.getProducts(),
+  } = useQuery<GetProductsType>({
+    queryKey: ['products', pageNumber, keyword],
+    queryFn: () => services.products.getProducts(pageNumber, keyword),
   });
 
   const { mutate: createProduct, isPending: loadingCreate } =
@@ -95,7 +99,7 @@ export const ProductList = () => {
               </tr>
             </thead>
             <tbody>
-              {products?.map((product) => (
+              {productData?.products?.map((product) => (
                 <tr key={product._id}>
                   <td>{product._id}</td>
                   <td>{product.name}</td>
@@ -120,6 +124,12 @@ export const ProductList = () => {
               ))}
             </tbody>
           </Table>
+          <Components.Paginate
+            pages={productData?.pages!}
+            page={pageNumber}
+            pageUrl='/admin/productlist'
+            keyword={keyword}
+          />
         </>
       )}
     </>
